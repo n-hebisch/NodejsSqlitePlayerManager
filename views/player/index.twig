@@ -1,0 +1,41 @@
+{% extends 'layout.twig' %}
+{#Block override the default one#}
+{% block body %}
+    {{ parent() }}
+    <ul id="playerList"></ul>
+
+    Name:<input id="input">
+    <button onclick="createPlayer(document.getElementById('input').value)">Create Player</button><br>
+
+    <br>
+{% endblock body %}
+
+{% block list %}
+    {{ parent() }}
+    <ul>
+        {% for player in players %}
+            <li id="{{ player[0] }}">
+                ID:{{ player[0] }},
+                <input value='{{ player[1] }}' onkeypress="return event.charCode !== 44" disabled="true">
+                <button name="Edit" onclick=" this.parentNode.getElementsByTagName('input')[0].disabled = false
+            changeButtonLevelTo(2, this)">Edit
+                </button>
+                <button name="Delete" onclick="deletePlayerById(parseInt(this.parentNode.id))">X</button>
+                <button name="Save" onclick="editPlayername(this.parentNode.getElementsByTagName('input')[0].value, parseInt(this.parentNode.id))
+
+            this.parentNode.getElementsByTagName('input')[0].disabled = true
+            changeButtonLevelTo(1, this)" style="display: none">Save
+                </button>
+
+            </li>
+        {% else %}
+            <li><em>no player found</em></li>
+        {% endfor %}
+    </ul>
+{% endblock %}
+
+
+{% block js %}
+    {{ parent() }}
+    <script src="/javascripts/AJAXplayer.js"></script>
+{% endblock body %}
