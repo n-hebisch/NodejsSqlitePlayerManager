@@ -14,9 +14,9 @@
     {{ parent() }}
     <ul>
         {% for player in players %}
-            <li id="{{ player[0] }}">
-                ID:{{ player[0] }},
-                <input value='{{ player[1] }}' onkeypress="return event.charCode !== 44" disabled="true">
+            <li id="{{ player.id }}">
+                ID:{{ player.id }},
+                <input value='{{ player.name }}' onkeypress="return event.charCode !== 44" disabled="true">
                 <button name="Edit" onclick=" this.parentNode.getElementsByTagName('input')[0].disabled = false
             changeButtonLevelTo(2, this)">Edit
                 </button>

@@ -1,13 +1,14 @@
 var express = require('express')
 var router = express.Router()
 
-const players = require('../Players.js');
-const fileManager = require('../FileManager.js');
+const players = require('../Players.js')
+const fileManager = require('../FileManager.js')
+const playerDBManager = require('../playersDBManager.js')
 
 router.get('/', function (req, res) {
-  var contentFile = fileManager.load('./players.csv');
-  var playerArray=players.convertToArray(contentFile);
-  res.render('player/index', {players:playerArray})
+  playerDBManager.getAllExistingPlayers(function (data) {
+    res.render('player/index', {players: data})
+  })
 })
 
 // Get a player
@@ -15,48 +16,51 @@ router.get('/:id', function (req, res) {
   var contentFile = fileManager.load('./players.csv')
 
   if (req.params.id !== undefined) {
-    var playerCSVLine = players.findById(req.params.id, contentFile)
-    //response: player csv line
-    var newcontentFile = fileManager.load('./players.csv');
-    var array=players.convertToArray(newcontentFile);
-    res.render('player/index', {players:array})
+    playerDBManager.getPlayerById(req.params.id, function (data) {
+      res.render('player/index', {players: data})
+    })
   }
-    else {
-    //response: complete player csv
-    res.send(contentFile)
+  else {
+    playerDBManager.getAllExistingPlayers(function (data) {
+      res.render('player/index', {players: data})
+    })
   }
 })
 
 // Create a new player
 router.post('/', function (req, res) {
-
-  var csvFile = fileManager.load('./players.csv')
-  var content = players.createPlayer(req, csvFile)
-  fileManager.save('./players.csv', content)
-
-  var array=players.convertToArray(content);
-  res.render('player/index', {players:array})
+  var promiseCreatePlayer = playerDBManager.createPlayer(req.body.name)
+  promiseCreatePlayer.then(function (result) {
+    playerDBManager.getAllExistingPlayers(function (data) {
+      res.render('player/index', {players: data})
+    })
+  }, function (err) {
+    console.log(err)
+  })
 })
 
 // Edit a player
 router.put('/', function (req, res) {
-  var csvFile = fileManager.load('./players.csv')
-  var content = players.editPlayernameById(req.body.id, req.body.name, csvFile)
-  fileManager.save('./players.csv', content)
-
-  var array=players.convertToArray(content);
-  res.render('player/index', {players:array})
+  var promiseEditPlayer = playerDBManager.editPlayernameById(req.body.id, req.body.name)
+  promiseEditPlayer.then(function (result) {
+    playerDBManager.getAllExistingPlayers(function (data) {
+      res.render('player/index', {players: data})
+    })
+  }, function (err) {
+    console.log(err)
+  })
 })
+
 // Delete a player
 router.delete('/', function (req, res) {
-  var csvFile = fileManager.load('./players.csv')
-  var content = players.deletePlayerById(req.body.id, csvFile)
-  fileManager.save('./players.csv', content)
-
-  var array=players.convertToArray(content);
-  res.render('player/index', {players:array})
+  var promiseDeletePlayer = playerDBManager.deletePlayerById(req.body.id)
+  promiseDeletePlayer.then(function (result) {
+    playerDBManager.getAllExistingPlayers(function (data) {
+      res.render('player/index', {players: data})
+    })
+  }, function (err) {
+    console.log(err)
+  })
 })
-
-
 
 module.exports = router
